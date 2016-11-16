@@ -1,0 +1,5 @@
+service:
+  ip: 127.0.0.1
+  port: 1337
+  script: "./deploy.sh"
+  secret: "pleasechange"
