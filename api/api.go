@@ -20,6 +20,8 @@ func main() {
 
 	// Launch REST Api
 	http.HandleFunc("/api/deploy", apiHandler)
+
+	fmt.Printf("Listening on %s:%d\n", config.API.IP, config.API.Port)
 	http.ListenAndServe(fmt.Sprintf("%s:%d", config.API.IP, config.API.Port), nil)
 }
 

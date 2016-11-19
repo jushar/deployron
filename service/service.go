@@ -30,6 +30,8 @@ func main() {
 	// TODO: Make this more fine-grained
 	os.Chmod(config.Service.Unixsocket, 0777)
 
+	fmt.Println("Waiting for commands")
+
 	defer os.Remove(config.Service.Unixsocket)
 
 	// Wait for commands
