@@ -17,6 +17,9 @@ func main() {
 	// Read config
 	configor.Load(&config, "config.yml")
 
+	// Remove old sockets (in case the service crashed)
+	os.Remove(config.Service.Unixsocket)
+
 	// Start unix socket
 	l, err := net.ListenUnix("unix", &net.UnixAddr{config.Service.Unixsocket, "unix"})
 	if err != nil {
