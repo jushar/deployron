@@ -1,8 +1,9 @@
 #!/bin/bash
-CONTAINER_NAME=""
-IMAGE_NAME=""
+CONTAINER_NAME="mycardea"
+IMAGE_NAME="cardea-web"
 IMAGE_URL=""
 
+whoami
 
 # Drop old containers
 docker stop $CONTAINER_NAME

@@ -25,5 +25,5 @@ _testmain.go
 
 .vscode
 debug
-setuidhelper
-
+api/api
+service/service

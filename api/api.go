@@ -1,16 +1,18 @@
-package api
+package main
 
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+	"net"
 	"net/http"
-	"os/exec"
+	"os"
 
+	"github.com/Jusonex/docker-autodeploy/common"
 	"github.com/jinzhu/configor"
 )
 
 var config common.Config
+var serviceConn *net.UnixConn
 
 func main() {
 	// Read config
@@ -21,22 +23,17 @@ func main() {
 
 	// Launch REST Api
 	http.HandleFunc("/api/deploy", apiHandler)
-	http.ListenAndServe(fmt.Sprintf("%s:%d", config.Service.IP, config.Service.Port), nil)
+	http.ListenAndServe(fmt.Sprintf("%s:%d", config.API.IP, config.API.Port), nil)
 }
 
 func apiHandler(res http.ResponseWriter, req *http.Request) {
 	// Check API secret
-	if req.Header.Get("APISecret") != config.Service.Secret && false {
+	if req.Header.Get("APISecret") != config.API.Secret && false {
 		sendJSONError(res, "Wrong API secret")
 		return
 	}
 
-	// Execute deploy script
-	cmd := exec.Command(config.Service.Script)
-	err := cmd.Run()
-	if err != nil {
-		log.Panic(err)
-	}
+	sendMessageToService("EXC_DEPLOY", "")
 }
 
 func sendJSONError(res http.ResponseWriter, message string) {
@@ -46,4 +43,15 @@ func sendJSONError(res http.ResponseWriter, message string) {
 
 	json.NewEncoder(res).Encode(Error{Error: message})
 	res.Header().Set("Content-Type", "application/json")
+}
+
+func sendMessageToService(identifier string, parameter string) {
+	// Connect to unix socket
+	serviceConn, err := net.DialUnix("unix", &net.UnixAddr{config.API.Unixsocket, "unix"}, &net.UnixAddr{config.Service.Unixsocket, "unix"})
+	if err != nil {
+		panic(err)
+	}
+	defer os.Remove(config.API.Unixsocket)
+
+	serviceConn.Write(common.WriteMessage(&common.Message{Identifier: identifier, Parameter: parameter}))
 }

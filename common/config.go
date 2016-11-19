@@ -1,10 +1,11 @@
-package config
+package common
 
 type Config struct {
-	Api struct {
-		IP     string `default:""`
-		Port   uint   `required:"true" default:"1337"`
-		Secret string `required:"true"`
+	API struct {
+		IP         string `default:""`
+		Port       uint   `required:"true" default:"1337"`
+		Secret     string `required:"true"`
+		Unixsocket string `required:"true"`
 	}
 
 	Service struct {
