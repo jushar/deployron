@@ -3,8 +3,6 @@ CONTAINER_NAME="mycardea"
 IMAGE_NAME="cardea-web"
 IMAGE_URL=""
 
-whoami
-
 # Drop old containers
 docker stop $CONTAINER_NAME
 docker rm $CONTAINER_NAME

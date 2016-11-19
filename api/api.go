@@ -18,9 +18,6 @@ func main() {
 	// Read config
 	configor.Load(&config, "config.yml")
 
-	// Do some integrity checks
-	// TODO
-
 	// Launch REST Api
 	http.HandleFunc("/api/deploy", apiHandler)
 	http.ListenAndServe(fmt.Sprintf("%s:%d", config.API.IP, config.API.Port), nil)
@@ -28,7 +25,7 @@ func main() {
 
 func apiHandler(res http.ResponseWriter, req *http.Request) {
 	// Check API secret
-	if req.Header.Get("APISecret") != config.API.Secret && false {
+	if req.Header.Get("APISecret") != config.API.Secret {
 		sendJSONError(res, "Wrong API secret")
 		return
 	}
