@@ -1,5 +1,8 @@
-service:
+api:
   ip: 127.0.0.1
   port: 1337
-  script: "./deploy.sh"
   secret: "pleasechange"
+
+service:
+  unixsocket: "./service_socket.sock"
+  script: "./deploy.sh"

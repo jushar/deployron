@@ -1,4 +1,4 @@
-package main
+package api
 
 import (
 	"encoding/json"
@@ -10,16 +10,7 @@ import (
 	"github.com/jinzhu/configor"
 )
 
-type Config struct {
-	Service struct {
-		IP     string `default:""`
-		Port   uint   `required:"true" default:"1337"`
-		Script string `default:"./deploy.sh"`
-		Secret string `required:"true"`
-	}
-}
-
-var config Config
+var config common.Config
 
 func main() {
 	// Read config
