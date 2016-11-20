@@ -27,7 +27,7 @@ func main() {
 
 func apiHandler(res http.ResponseWriter, req *http.Request) {
 	// Check API secret
-	if req.Header.Get("APISecret") != config.API.Secret {
+	if req.URL.Query().Get("APISecret") != config.API.Secret {
 		sendJSONError(res, "Wrong API secret")
 		return
 	}
