@@ -6,4 +6,5 @@ api:
 
 service:
   unixsocket: "./service.sock"
-  script: "./deploy.sh"
+  script:
+  - echo "Hello World"

@@ -1,8 +1,8 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
-	"log"
 	"net"
 	"os"
 	"os/exec"
@@ -62,11 +62,18 @@ func main() {
 func processMessage(message *common.Message) {
 	switch message.Identifier {
 	case "EXC_DEPLOY":
+		var commandBuffer bytes.Buffer
+
+		for _, line := range config.Service.Script {
+			commandBuffer.WriteString(line)
+			commandBuffer.WriteString("; ")
+		}
+
 		// Execute deploy script
-		cmd := exec.Command(config.Service.Script)
+		cmd := exec.Command("/bin/sh", "-c", commandBuffer.String())
 		err := cmd.Run()
 		if err != nil {
-			log.Panic(err)
+			fmt.Fprintf(os.Stderr, "Executing the script failed: %s\n", err.Error())
 		}
 	}
 }

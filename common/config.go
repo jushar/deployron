@@ -10,6 +10,6 @@ type Config struct {
 
 	Service struct {
 		Unixsocket string `required:"true"`
-		Script     string `default:"./deploy.sh"`
+		Script     []string
 	}
 }
