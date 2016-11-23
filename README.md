@@ -5,7 +5,7 @@ _Deployron_ is a small and lightweight deployment tool that is preferably used w
 ![Architecture Image](http://i.imgur.com/zCq1YLQ.png)
 
 ## Installation
-1. Download the latest release from the release section.
+1. Download and extract the latest release from the release section. If you want to use it with _systemd_, make sure you extract the archive to `/var/lib/deployron/`.
 2. Update your `config.yml`
 3. Update `config.yml` permissions (otherwise the backend service will not start)
   ```bash
@@ -15,12 +15,16 @@ _Deployron_ is a small and lightweight deployment tool that is preferably used w
   # Change user to root
   chown root:root config.yml
   ```
-4. Install the _systemd_ services.
+4. Install the _systemd_ services (optional)
   ```bash
+  # Copy service unit files
   cp systemd/*.service /etc/systemd/system/
+
+  # Create user (hosts the API)
+  useradd -d /var/lib/deployron/ -M deployron
   ```
 
-5. Start and enable the systemd services
+5. Start and enable the systemd services (optional)
   ```bash
   # Start
   systemctl start deployron.service

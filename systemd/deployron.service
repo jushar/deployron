@@ -1,0 +1,10 @@
+[Unit]
+Description=Deployron Backend Service
+
+[Service]
+Type=simple
+ExecStart=/var/lib/deployron/service
+WorkingDirectory=/var/lib/deployron
+
+[Install]
+WantedBy=multi-user.target

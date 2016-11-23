@@ -1,0 +1,11 @@
+[Unit]
+Description=Deployron API service
+
+[Service]
+Type=simple
+ExecStart=/var/lib/deployron/api
+WorkingDirectory=/var/lib/deployron
+User=deployron
+
+[Install]
+WantedBy=multi-user.target
