@@ -8,7 +8,7 @@ import (
 	"os/exec"
 	"syscall"
 
-	"github.com/Jusonex/docker-autodeploy/common"
+	"github.com/Jusonex/deployron/common"
 	"github.com/jinzhu/configor"
 )
 
