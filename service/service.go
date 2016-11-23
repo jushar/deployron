@@ -6,6 +6,7 @@ import (
 	"net"
 	"os"
 	"os/exec"
+	"syscall"
 
 	"github.com/Jusonex/docker-autodeploy/common"
 	"github.com/jinzhu/configor"
@@ -17,6 +18,16 @@ func main() {
 	// Read config
 	configor.Load(&config, "config.yml")
 
+	// Do some integrity checks
+	// Make sure config.yml is owned by root (as editing it would result in root privileges)
+	statInfo, err := os.Stat("config.yml")
+	if err != nil {
+		panic(err)
+	}
+	if (statInfo.Mode()&0x1B) != 0 || statInfo.Sys().(*syscall.Stat_t).Uid != 0 { // 0x1B = ~0x1E4 = 774 base 8
+		panic("Make sure config.yml is owned by root and group and other don't have write permissions")
+	}
+
 	// Remove old sockets (in case the service crashed)
 	os.Remove(config.Service.Unixsocket)
 
@@ -25,14 +36,13 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	defer os.Remove(config.Service.Unixsocket)
 
 	// Update permissions
 	// TODO: Make this more fine-grained
 	os.Chmod(config.Service.Unixsocket, 0777)
 
 	fmt.Println("Waiting for commands")
-
-	defer os.Remove(config.Service.Unixsocket)
 
 	// Wait for commands
 	for {
