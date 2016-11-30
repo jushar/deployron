@@ -6,6 +6,7 @@ type Deployment struct {
 	Name        string
 	Description string
 	Secret      string `required:"true"`
+	User        string `default:"root"`
 	Script      []string
 }
 

@@ -85,7 +85,7 @@ func processMessage(message *common.Message) {
 		}
 
 		// Prepare deploy script for execution
-		cmd := exec.Command("/bin/sh", "-c", commandBuffer.String())
+		cmd := exec.Command("su", "-s", "/bin/sh", "-c", commandBuffer.String(), deployment.User)
 
 		// Redirect stdout, stderr
 		cmd.Stdout = os.Stdout

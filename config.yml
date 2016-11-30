@@ -11,11 +11,15 @@ deployments:
 - name: mydeploy1
   secret: deploy1secret
   description: "My test deploy service 1"
+  user: root
   script:
-  - echo "Hello World"
-  
+  - echo "Hello World from mydeploy1"
+  - whoami
+
 - name: mydeploy2
   secret: deploy2secret
-  description: "My test deploy service 1"
+  description: "My test deploy service 2"
+  user: vm
   script:
-  - echo "Hello World"
+  - echo "Hello World from mydeploy2"
+  - whoami
