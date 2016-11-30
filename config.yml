@@ -6,5 +6,16 @@ api:
 
 service:
   unixsocket: "./service.sock"
+
+deployments:
+- name: mydeploy1
+  secret: deploy1secret
+  description: "My test deploy service 1"
+  script:
+  - echo "Hello World"
+  
+- name: mydeploy2
+  secret: deploy2secret
+  description: "My test deploy service 1"
   script:
   - echo "Hello World"

@@ -9,14 +9,13 @@ import (
 	"syscall"
 
 	"github.com/Jusonex/deployron/common"
-	"github.com/jinzhu/configor"
 )
 
-var config common.Config
+var config *common.Config
 
 func main() {
 	// Read config
-	configor.Load(&config, "config.yml")
+	config = common.MakeConfig("config.yml")
 
 	// Do some integrity checks
 	// Make sure config.yml is owned by root (as editing it would result in root privileges)
@@ -72,15 +71,27 @@ func main() {
 func processMessage(message *common.Message) {
 	switch message.Identifier {
 	case "EXC_DEPLOY":
-		var commandBuffer bytes.Buffer
+		deployment := config.FindDeploymentByName(message.Parameter)
 
-		for _, line := range config.Service.Script {
+		if deployment == nil {
+			fmt.Fprintf(os.Stderr, "Invalid deployment service name passed")
+			return
+		}
+
+		var commandBuffer bytes.Buffer
+		for _, line := range deployment.Script {
 			commandBuffer.WriteString(line)
 			commandBuffer.WriteString("; ")
 		}
 
-		// Execute deploy script
+		// Prepare deploy script for execution
 		cmd := exec.Command("/bin/sh", "-c", commandBuffer.String())
+
+		// Redirect stdout, stderr
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+
+		// Run deploy script
 		err := cmd.Run()
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Executing the script failed: %s\n", err.Error())

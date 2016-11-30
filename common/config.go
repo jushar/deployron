@@ -1,5 +1,14 @@
 package common
 
+import "github.com/jinzhu/configor"
+
+type Deployment struct {
+	Name        string
+	Description string
+	Secret      string `required:"true"`
+	Script      []string
+}
+
 type Config struct {
 	API struct {
 		IP         string `default:""`
@@ -10,6 +19,26 @@ type Config struct {
 
 	Service struct {
 		Unixsocket string `required:"true"`
-		Script     []string
 	}
+
+	Deployments []Deployment
+}
+
+func MakeConfig(path string) *Config {
+	var config Config
+
+	// Read config
+	configor.Load(&config, path)
+
+	return &config
+}
+
+func (config *Config) FindDeploymentByName(name string) *Deployment {
+	for _, deployment := range config.Deployments {
+		if deployment.Name == name {
+			return &deployment
+		}
+	}
+
+	return nil
 }

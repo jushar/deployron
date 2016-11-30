@@ -8,31 +8,43 @@ import (
 	"os"
 
 	"github.com/Jusonex/deployron/common"
-	"github.com/jinzhu/configor"
+	"github.com/gorilla/mux"
 )
 
-var config common.Config
+var config *common.Config
 var serviceConn *net.UnixConn
 
 func main() {
-	// Read config
-	configor.Load(&config, "config.yml")
+	// Create config
+	config = common.MakeConfig("config.yml")
 
-	// Launch REST Api
-	http.HandleFunc("/api/deploy", apiHandler)
+	// Launch REST API
+	router := mux.NewRouter()
+	router.HandleFunc("/deploy/{name}", apiHandler)
+	http.Handle("/", router)
 
 	fmt.Printf("Listening on %s:%d\n", config.API.IP, config.API.Port)
 	http.ListenAndServe(fmt.Sprintf("%s:%d", config.API.IP, config.API.Port), nil)
 }
 
 func apiHandler(res http.ResponseWriter, req *http.Request) {
-	// Check API secret
-	if req.URL.Query().Get("APISecret") != config.API.Secret {
-		sendJSONError(res, "Wrong API secret")
+	params := mux.Vars(req)
+	deployName := params["name"]
+	deployment := config.FindDeploymentByName(deployName)
+
+	// Check if there is a deployment with this name
+	if deployment == nil {
+		sendJSONError(res, "Unknown deployment")
 		return
 	}
 
-	sendMessageToService("EXC_DEPLOY", "")
+	// Check API secrets
+	if req.URL.Query().Get("APISecret") != deployment.Secret {
+		sendJSONError(res, "Wrong deploy secret")
+		return
+	}
+
+	sendMessageToService("EXC_DEPLOY", deployName)
 }
 
 func sendJSONError(res http.ResponseWriter, message string) {
