@@ -3,26 +3,25 @@ package common
 import "github.com/jinzhu/configor"
 
 type Deployment struct {
-	Name        string
-	Description string
-	Secret      string `required:"true"`
-	User        string `default:"root"`
-	Script      []string
+	Name        string   `required:"true"`
+	Description string   `default:""`
+	Secret      string   `required:"true"`
+	User        string   `default:"root"`
+	Script      []string `required:"true"`
 }
 
 type Config struct {
 	API struct {
 		IP         string `default:""`
-		Port       uint   `required:"true" default:"1337"`
-		Secret     string `required:"true"`
-		Unixsocket string `required:"true"`
+		Port       uint   `default:"1337"`
+		Unixsocket string `default:"./service_client.sock"`
 	}
 
 	Service struct {
-		Unixsocket string `required:"true"`
+		Unixsocket string `default:"./service.sock"`
 	}
 
-	Deployments []Deployment
+	Deployments []Deployment `required:"true"`
 }
 
 func MakeConfig(path string) *Config {
