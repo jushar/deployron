@@ -19,11 +19,7 @@ deployments:
   secret: deploy2secret
   description: "My test deploy service 2"
   user: vm
-  autodeploy:
-    cron: "@midnight"
-    only_on_change: true
-    script_no_change:
-    - echo "Script that is executed if nothing changed"
+  cron_deploy: "@every 5s"
   script:
   - echo "Hello World from mydeploy2"
   - whoami

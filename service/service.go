@@ -9,6 +9,7 @@ import (
 	"syscall"
 
 	"github.com/Jusonex/deployron/common"
+	"github.com/robfig/cron"
 )
 
 var config *common.Config
@@ -41,6 +42,18 @@ func main() {
 	// TODO: Make this more fine-grained
 	os.Chmod(config.Service.Unixsocket, 0777)
 
+	// Register cron jobs
+	cron := cron.New()
+	for _, deployment := range config.Deployments {
+		if deployment.CronDeploy != "" {
+			cron.AddFunc(deployment.CronDeploy, func() {
+				fmt.Println("[CRON] Launching '" + deployment.Name + "'")
+				executeDeployScript(deployment.Name)
+			})
+		}
+	}
+	cron.Start()
+
 	fmt.Println("Waiting for commands")
 
 	// Wait for commands
@@ -71,30 +84,34 @@ func main() {
 func processMessage(message *common.Message) {
 	switch message.Identifier {
 	case "EXC_DEPLOY":
-		deployment := config.FindDeploymentByName(message.Parameter)
+		executeDeployScript(message.Parameter)
+	}
+}
 
-		if deployment == nil {
-			fmt.Fprintf(os.Stderr, "Invalid deployment service name passed")
-			return
-		}
+func executeDeployScript(name string) {
+	deployment := config.FindDeploymentByName(name)
 
-		var commandBuffer bytes.Buffer
-		for _, line := range deployment.Script {
-			commandBuffer.WriteString(line)
-			commandBuffer.WriteString("; ")
-		}
+	if deployment == nil {
+		fmt.Fprintf(os.Stderr, "Invalid deployment service name passed")
+		return
+	}
 
-		// Prepare deploy script for execution
-		cmd := exec.Command("su", "-s", "/bin/sh", "-c", commandBuffer.String(), deployment.User)
+	var commandBuffer bytes.Buffer
+	for _, line := range deployment.Script {
+		commandBuffer.WriteString(line)
+		commandBuffer.WriteString("; ")
+	}
 
-		// Redirect stdout, stderr
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
+	// Prepare deploy script for execution
+	cmd := exec.Command("su", "-s", "/bin/sh", "-c", commandBuffer.String(), deployment.User)
 
-		// Run deploy script
-		err := cmd.Run()
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Executing the script failed: %s\n", err.Error())
-		}
+	// Redirect stdout, stderr
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	// Run deploy script
+	err := cmd.Run()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Executing the script failed: %s\n", err.Error())
 	}
 }
