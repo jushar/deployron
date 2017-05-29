@@ -103,7 +103,7 @@ func executeDeployScript(name string) {
 	}
 
 	// Prepare deploy script for execution
-	cmd := exec.Command("su", "-s", "/bin/sh", "-c", commandBuffer.String(), deployment.User)
+	cmd := exec.Command("su", "-s", "/bin/bash", "-c", commandBuffer.String(), deployment.User)
 
 	// Redirect stdout, stderr
 	cmd.Stdout = os.Stdout
