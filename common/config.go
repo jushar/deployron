@@ -3,11 +3,16 @@ package common
 import "github.com/jinzhu/configor"
 
 type Deployment struct {
-	Name        string   `required:"true"`
-	Description string   `default:""`
-	Secret      string   `required:"true"`
-	User        string   `default:"root"`
-	Script      []string `required:"true"`
+	Name        string `required:"true"`
+	Description string `default:""`
+	Secret      string `required:"true"`
+	User        string `default:"root"`
+	Autodeploy  struct {
+		Cron           string
+		OnlyOnChange   bool
+		ScriptNoChange []string
+	}
+	Script []string `required:"true"`
 }
 
 type Config struct {
